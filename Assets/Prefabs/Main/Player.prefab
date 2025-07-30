@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 3219772830151570126}
   - component: {fileID: 2941578126507716988}
   - component: {fileID: 7279738562928197382}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -75,6 +75,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   rotateSpeed: 720
+  recordedInputs: []
+  isRecording: 1
 --- !u!1 &7797777809701470602
 GameObject:
   m_ObjectHideFlags: 0
@@ -87,7 +89,7 @@ GameObject:
   - component: {fileID: 6970507816741029921}
   - component: {fileID: 525870101610595096}
   - component: {fileID: 4466964060385353851}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Model
   m_TagString: Player
   m_Icon: {fileID: 0}
