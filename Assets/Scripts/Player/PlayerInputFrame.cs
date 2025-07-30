@@ -4,13 +4,9 @@ using UnityEngine;
 public class PlayerInputFrame
 {
     public Vector2 moveInput;
-    public bool interactPressed;
-    public bool attackPressed;
 
-    public PlayerInputFrame(Vector2 move, bool interact, bool attack)
+    public PlayerInputFrame(Vector2 moveInput)
     {
-        moveInput = move;
-        interactPressed = interact;
-        attackPressed = attack;
+        this.moveInput = moveInput;
     }
 }

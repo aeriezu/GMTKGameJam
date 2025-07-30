@@ -69,7 +69,7 @@ public class TimeLoopManager : MonoBehaviour
         GhostController ghostController = ghost.GetComponent<GhostController>();
         if (ghostController != null)
         {
-            ghostController.StartReplay(new List<PlayerInputFrame>(playerController.recordedInputs)); // Deep copy
+            ghostController.StartReplay(new List<PlayerInputFrame>(playerController.recordedInputs));
         }
 
         // Reset the player position

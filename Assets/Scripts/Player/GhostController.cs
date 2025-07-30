@@ -1,16 +1,15 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GhostController : MonoBehaviour
 {
     public List<PlayerInputFrame> replayInputs;
-    public float moveSpeed = 5f;
+    public float moveDelay = 0.2f;
+    public float gridSize = 1f;
 
-    private Rigidbody2D rb;
     private int currentFrame = 0;
     private bool isReplaying = false;
-
-    private void Awake() => rb = GetComponent<Rigidbody2D>();
 
     public void StartReplay(List<PlayerInputFrame> inputs)
     {
@@ -23,20 +22,26 @@ public class GhostController : MonoBehaviour
         replayInputs = inputs;
         currentFrame = 0;
         isReplaying = true;
+
+        StartCoroutine(ReplayMovement());
     }
 
-    private void FixedUpdate()
+    private IEnumerator ReplayMovement()
     {
-        if (!isReplaying || currentFrame >= replayInputs.Count)
+        while (isReplaying && currentFrame < replayInputs.Count)
         {
-            isReplaying = false;
-            return;
+            Vector2 dir = replayInputs[currentFrame].moveInput;
+
+            if (dir != Vector2.zero)
+            {
+                Vector3 targetPos = transform.position + (Vector3)(dir.normalized * gridSize);
+                transform.position = targetPos;
+            }
+
+            currentFrame++;
+            yield return new WaitForSeconds(moveDelay);
         }
 
-        PlayerInputFrame input = replayInputs[currentFrame];
-        Vector2 move = input.moveInput * moveSpeed * Time.fixedDeltaTime;
-        rb.MovePosition(rb.position + move);
-
-        currentFrame++;
+        isReplaying = false;
     }
 }
