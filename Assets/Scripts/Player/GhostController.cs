@@ -1,47 +1,76 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GhostController : MonoBehaviour
 {
     public List<PlayerInputFrame> replayInputs;
-    public float moveDelay = 0.2f;
-    public float gridSize = 1f;
+    public float moveTime = 0.2f;
 
+    private Vector2 startPosition;
+    private Vector2 targetPosition;
+    private bool isMoving = false;
+    private float elapsed = 0f;
     private int currentFrame = 0;
-    private bool isReplaying = false;
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
+
+    private void Awake()
+    {
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        startPosition = transform.position;
+        targetPosition = startPosition;
+    }
 
     public void StartReplay(List<PlayerInputFrame> inputs)
     {
-        if (inputs == null || inputs.Count == 0)
-        {
-            Debug.LogWarning("No inputs to replay.");
-            return;
-        }
-
         replayInputs = inputs;
         currentFrame = 0;
-        isReplaying = true;
-
-        StartCoroutine(ReplayMovement());
+        isMoving = false;
+        elapsed = 0f;
+        startPosition = transform.position;
+        targetPosition = startPosition;
     }
 
-    private IEnumerator ReplayMovement()
+    private void FixedUpdate()
     {
-        while (isReplaying && currentFrame < replayInputs.Count)
+        if (replayInputs == null || currentFrame >= replayInputs.Count)
+            return;
+
+        if (isMoving)
         {
-            Vector2 dir = replayInputs[currentFrame].moveInput;
+            elapsed += Time.fixedDeltaTime;
+            Vector2 lerpedPos = Vector2.Lerp(startPosition, targetPosition, elapsed / moveTime);
+            transform.position = new Vector3(lerpedPos.x, lerpedPos.y, -0.1f);  // lock Z here
 
-            if (dir != Vector2.zero)
+            if (elapsed >= moveTime)
             {
-                Vector3 targetPos = transform.position + (Vector3)(dir.normalized * gridSize);
-                transform.position = targetPos;
+                transform.position = new Vector3(targetPosition.x, targetPosition.y, -0.1f);  // lock Z here too
+                isMoving = false;
+                elapsed = 0f;
+                currentFrame++;
             }
-
-            currentFrame++;
-            yield return new WaitForSeconds(moveDelay);
         }
+        else
+        {
+            PlayerInputFrame input = replayInputs[currentFrame];
+            Vector2 moveDir = input.moveInput;
 
-        isReplaying = false;
+            animator.SetBool("IsMoving", input.isMoving);
+            spriteRenderer.flipX = input.flipX;
+
+            if (moveDir != Vector2.zero)
+            {
+                startPosition = transform.position;
+                targetPosition = startPosition + moveDir;
+
+                isMoving = true;
+                elapsed = 0f;
+            }
+            else
+            {
+                currentFrame++;
+            }
+        }
     }
 }

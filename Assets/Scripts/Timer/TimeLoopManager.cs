@@ -18,7 +18,7 @@ public class TimeLoopManager : MonoBehaviour
     void Start()
     {
         currentTime = startingTime;
-        player.GetComponent<TopDownPlayerController>().SaveStartPoint();
+        player.GetComponent<PlayerController>().SaveStartPoint();
     }
 
     void Update()
@@ -45,48 +45,46 @@ public class TimeLoopManager : MonoBehaviour
 
         Debug.Log("Loop triggered!");
 
-        // Spawn ghost
         SpawnGhost();
 
-        // Call any other systems
         OnLoopTriggered?.Invoke();
 
-        // Reset the loop shortly after for sync
         Invoke(nameof(ResetLoop), 0.1f);
     }
 
     private void SpawnGhost()
     {
-        var playerController = player.GetComponent<TopDownPlayerController>();
+        var playerController = player.GetComponent<PlayerController>();
         if (playerController == null) return;
 
-        // Instantiate the ghost
+        // Get the saved start position and force z to -0.1f so ghost is in front
         Vector3 spawnPos = playerController.startPosition;
-        Quaternion spawnRot = playerController.startRotation;
+        spawnPos.z = -0.1f;  // Set Z to -0.1 here explicitly
+        
+        // Use default rotation or identity if you want
+        Quaternion spawnRot = Quaternion.identity;
+
         GameObject ghost = Instantiate(ghostPrefab, spawnPos, spawnRot);
 
-        // Pass the recorded inputs
         GhostController ghostController = ghost.GetComponent<GhostController>();
         if (ghostController != null)
         {
             ghostController.StartReplay(new List<PlayerInputFrame>(playerController.recordedInputs));
         }
 
-        // Reset the player position
-        player.transform.position = playerSpawnPoint.position;
-        player.transform.rotation = playerSpawnPoint.rotation;
+        // Reset the player position and rotation to start
+        player.transform.position = playerController.startPosition;
+        player.transform.rotation = spawnRot;
 
-        // Clear input history
         playerController.ClearRecording();
     }
+
 
     private void ResetLoop()
     {
         currentTime = startingTime;
         isLooping = false;
 
-        // Save new starting point for next ghost
-        player.GetComponent<TopDownPlayerController>().SaveStartPoint();
+        player.GetComponent<PlayerController>().SaveStartPoint();
     }
-
 }

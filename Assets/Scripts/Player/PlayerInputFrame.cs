@@ -4,9 +4,13 @@ using UnityEngine;
 public class PlayerInputFrame
 {
     public Vector2 moveInput;
+    public bool isMoving;
+    public bool flipX;
 
-    public PlayerInputFrame(Vector2 moveInput)
+    public PlayerInputFrame(Vector2 move, bool moving, bool flip)
     {
-        this.moveInput = moveInput;
+        moveInput = move;
+        isMoving = moving;
+        flipX = flip;
     }
 }
